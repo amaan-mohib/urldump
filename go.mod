@@ -4,6 +4,8 @@ go 1.17
 
 require github.com/spf13/cobra v1.2.1
 
+require go.mongodb.org/mongo-driver v1.8.3 // indirect
+
 require (
 	github.com/nirasan/go-oauth-pkce-code-verifier v0.0.0-20170819232839-0fbfe93532da
 	github.com/pkg/errors v0.9.1 // indirect

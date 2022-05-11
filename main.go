@@ -8,9 +8,11 @@ import (
 	"cli/cmd"
 	"cli/internal"
 	"cli/utils"
+	"log"
 	"os"
 	"strings"
 
+	"github.com/joho/godotenv"
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/spf13/viper"
 )
@@ -57,6 +59,10 @@ func main() {
 
 	} else {
 		utils.CheckError(dbErr)
+	}
+
+	if err := godotenv.Load(); err != nil {
+		log.Fatalf("Error loading the .env file: %v", err)
 	}
 
 	cmd.Execute()

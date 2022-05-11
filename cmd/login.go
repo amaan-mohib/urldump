@@ -16,8 +16,8 @@ import (
 
 var reauth bool
 
-func auth() {
-	internal.AuthorizeUser("MaMKxlV3NAhQJPOjeBIr5dKRb21VQsaL", "https://dev-y3bdlwyd.us.auth0.com/api/v2/", "G2e-gAOgyQv4Y_3kHW9p7x7XxKTFZPh9zXMdUGPlDHfEPaqTlTYWB_18Q9GOPXG6", "dev-y3bdlwyd.us.auth0.com", "http://127.0.0.1:14565/oauth/callback/")
+func auth(clientID, audience, clientSecret, authDomain string) {
+	internal.AuthorizeUser(clientID, audience, clientSecret, authDomain, "http://127.0.0.1:14565/oauth/callback/")
 }
 
 // loginCmd represents the login command
@@ -31,15 +31,20 @@ Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
+		var clientID = os.Getenv("AUTH0_CLIENT_ID")
+		var authDomain = os.Getenv("AUTH0_DOMAIN")
+		var audience = os.Getenv("AUTH0_AUDIENCE")
+		var clientSecret = os.Getenv("AUTH0_CLIENT_SECRET")
+
 		if reauth {
-			auth()
+			auth(clientID, audience, clientSecret, authDomain)
 			os.Exit(0)
 		}
 		accessToken := viper.Get("tokens.AccessToken")
 		expiresAt := viper.Get("tokens.ExpiresAt")
-		// fmt.Println(accessToken)
+
 		if expiresAt != nil && expiresAt.(float64) < float64(time.Now().Unix()) {
-			internal.RefreshToken("MaMKxlV3NAhQJPOjeBIr5dKRb21VQsaL", "G2e-gAOgyQv4Y_3kHW9p7x7XxKTFZPh9zXMdUGPlDHfEPaqTlTYWB_18Q9GOPXG6")
+			internal.RefreshToken(clientID, clientSecret)
 			name := viper.Get("user.name")
 			email := viper.Get("user.email")
 			fmt.Printf("\nAlready logged in as %v [%v]\n", name, email)
@@ -47,14 +52,14 @@ to quickly create a Cobra application.`,
 			if accessToken != nil {
 				isValid, err := internal.ValidateToken(accessToken.(string))
 				if !isValid && err != nil {
-					auth()
+					auth(clientID, audience, clientSecret, authDomain)
 				} else {
 					name := viper.Get("user.name")
 					email := viper.Get("user.email")
 					fmt.Printf("\nAlready logged in as %v [%v]\n", name, email)
 				}
 			} else {
-				auth()
+				auth(clientID, audience, clientSecret, authDomain)
 			}
 		}
 	},
